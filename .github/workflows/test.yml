@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        go:
+          - '1.19'
+    name: test go-${{ matrix.go }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+      - name: run test
+        run: go test -v -race ./...
+        env:
+          GO111MODULE: on
+  lint:
+    runs-on: ubuntu-22.04
+    name: lint
+    steps:
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48.0
