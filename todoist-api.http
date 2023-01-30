@@ -1,0 +1,2 @@
+GET https://api.todoist.com/rest/v2/projects
+Authorization: Bearer {{token}}
