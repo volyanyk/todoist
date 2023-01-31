@@ -6,10 +6,17 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type responseParser func(*http.Response) error
+
+type TodoistErrorResponse struct {
+	Err string
+}
+
+func (t TodoistErrorResponse) Error() string { return t.Err }
 
 func checkStatusCode(resp *http.Response, d Debug) error {
 	if resp.StatusCode == http.StatusTooManyRequests {
@@ -65,4 +72,16 @@ func (e *RateLimitedError) Error() string {
 
 func (e *RateLimitedError) Retryable() bool {
 	return true
+}
+
+func (t TodoistResponse) Err() error {
+	if t.Ok {
+		return nil
+	}
+
+	if strings.TrimSpace(t.Error) == "" {
+		return nil
+	}
+
+	return TodoistErrorResponse{Err: t.Error}
 }

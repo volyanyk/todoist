@@ -21,6 +21,11 @@ type Client struct {
 	httpclient    httpClient
 }
 
+type TodoistResponse struct {
+	Ok    bool   `json:"ok"`
+	Error string `json:"error"`
+}
+
 func (api *Client) Debugf(format string, v ...interface{}) {
 	if api.debug {
 		api.log.Output(2, fmt.Sprintf(format, v...))
@@ -45,14 +50,11 @@ func (api *Client) GetProjects() (*[]Project, error) {
 }
 
 func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
-	var response []Project
+	response := &ProjectsResponse{}
 
-	err := api.getMethod(context, "projects", api.token, url.Values{}, &response)
-	if err != nil {
-		return nil, nil // todo modify to ProjectsResponse with error and statuses
-	}
+	_ = api.getMethod(context, "projects", api.token, url.Values{}, &response)
 
-	return &response, nil
+	return &response.Projects, response.Err()
 }
 
 func (api *Client) getMethod(ctx context.Context, path string, token string, values url.Values, intf interface{}) interface{} {

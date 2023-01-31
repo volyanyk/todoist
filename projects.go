@@ -8,8 +8,9 @@ import (
 
 type Option func(*Client)
 
-func OptionAPIURL(u string) func(*Client) {
-	return func(c *Client) { c.endpoint = u }
+type ProjectsResponse struct {
+	Projects []Project `json:"projects"`
+	TodoistResponse
 }
 
 type Project struct {
@@ -25,6 +26,10 @@ type Project struct {
 	IsTeamInbox    bool   `json:"is_team_inbox"`
 	Url            string `json:"url"`
 	ViewStyle      string `json:"view_style"`
+}
+
+func OptionAPIURL(u string) func(*Client) {
+	return func(c *Client) { c.endpoint = u }
 }
 
 func New(token string, options ...Option) *Client {
