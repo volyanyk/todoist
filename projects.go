@@ -1,15 +1,17 @@
 package golang_todoist_api
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 )
 
 type Option func(*Client)
 
 type ProjectsResponse struct {
-	Projects []Project `json:"projects"`
+	Projects []Project
 	TodoistResponse
 }
 
@@ -45,4 +47,20 @@ func New(token string, options ...Option) *Client {
 	}
 
 	return s
+}
+
+func (api *Client) GetProjects() (*[]Project, error) {
+	return api.GetProjectsContext(context.Background())
+}
+
+func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
+	response := &ProjectsResponse{}
+
+	err := api.getMethod(context,
+		"projects",
+		api.token,
+		url.Values{},
+		&response.Projects)
+
+	return &response.Projects, err
 }

@@ -3,6 +3,7 @@ package golang_todoist_api
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"strconv"
@@ -28,7 +29,10 @@ func checkStatusCode(resp *http.Response, d Debug) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		logResponse(resp, d)
+		err := logResponse(resp, d)
+		if err != nil {
+			return err
+		}
 		return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
 	}
 
@@ -37,15 +41,18 @@ func checkStatusCode(resp *http.Response, d Debug) error {
 
 func doPost(ctx context.Context, client httpClient, req *http.Request, parser responseParser, d Debug) error {
 	resp, err := client.Do(req)
+
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(resp.Body)
 
 	err = checkStatusCode(resp, d)
-	if err != nil {
-		return err
-	}
 
 	return parser(resp)
 }

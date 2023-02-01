@@ -8,6 +8,7 @@ import (
 )
 
 func TestGetProjects(t *testing.T) {
+	http.DefaultServeMux = new(http.ServeMux)
 	http.HandleFunc("/projects", getProjects)
 	expectedProjects := getTestProjects()
 
@@ -53,5 +54,8 @@ func getProjects(rw http.ResponseWriter, r *http.Request) {
 	response, _ := json.Marshal(
 		getTestProjects(),
 	)
-	rw.Write(response)
+	_, err := rw.Write(response)
+	if err != nil {
+		return
+	}
 }

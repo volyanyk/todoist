@@ -13,12 +13,11 @@ const (
 )
 
 type Client struct {
-	token         string
-	appLevelToken string
-	endpoint      string
-	debug         bool
-	log           ilogger
-	httpclient    httpClient
+	token      string
+	endpoint   string
+	debug      bool
+	log        ilogger
+	httpclient httpClient
 }
 
 type TodoistResponse struct {
@@ -28,12 +27,18 @@ type TodoistResponse struct {
 
 func (api *Client) Debugf(format string, v ...interface{}) {
 	if api.debug {
-		api.log.Output(2, fmt.Sprintf(format, v...))
+		err := api.log.Output(2, fmt.Sprintf(format, v...))
+		if err != nil {
+			return
+		}
 	}
 }
 func (api *Client) Debugln(v ...interface{}) {
 	if api.debug {
-		api.log.Output(2, fmt.Sprintln(v...))
+		err := api.log.Output(2, fmt.Sprintln(v...))
+		if err != nil {
+			return
+		}
 	}
 }
 
@@ -45,19 +50,7 @@ type httpClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-func (api *Client) GetProjects() (*[]Project, error) {
-	return api.GetProjectsContext(context.Background())
-}
-
-func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
-	response := &ProjectsResponse{}
-
-	_ = api.getMethod(context, "projects", api.token, url.Values{}, &response)
-
-	return &response.Projects, response.Err()
-}
-
-func (api *Client) getMethod(ctx context.Context, path string, token string, values url.Values, intf interface{}) interface{} {
+func (api *Client) getMethod(ctx context.Context, path string, token string, values url.Values, intf interface{}) error {
 	return getResource(ctx, api.httpclient, api.endpoint+path, token, values, intf, api)
 }
 
