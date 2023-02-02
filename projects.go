@@ -14,6 +14,10 @@ type ProjectsResponse struct {
 	Projects []Project
 	TodoistResponse
 }
+type ProjectResponse struct {
+	Project Project
+	TodoistResponse
+}
 
 type Project struct {
 	ID             string `json:"id"`
@@ -52,6 +56,9 @@ func New(token string, options ...Option) *Client {
 func (api *Client) GetProjects() (*[]Project, error) {
 	return api.GetProjectsContext(context.Background())
 }
+func (api *Client) GetProjectById(id string) (*Project, error) {
+	return api.GetProjectByIdContext(id, context.Background())
+}
 
 func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
 	response := &ProjectsResponse{}
@@ -63,4 +70,16 @@ func (api *Client) GetProjectsContext(context context.Context) (*[]Project, erro
 		&response.Projects)
 
 	return &response.Projects, err
+}
+
+func (api *Client) GetProjectByIdContext(id string, context context.Context) (*Project, error) {
+	response := &ProjectResponse{}
+
+	err := api.getMethod(context,
+		"projects/"+id,
+		api.token,
+		url.Values{},
+		&response.Project)
+
+	return &response.Project, err
 }
