@@ -18,6 +18,10 @@ type ProjectResponse struct {
 	Project Project
 	TodoistResponse
 }
+type CollaboratorsResponse struct {
+	Collaborators []Collaborator
+	TodoistResponse
+}
 
 type Project struct {
 	ID             string `json:"id"`
@@ -32,6 +36,11 @@ type Project struct {
 	IsTeamInbox    bool   `json:"is_team_inbox"`
 	Url            string `json:"url"`
 	ViewStyle      string `json:"view_style"`
+}
+type Collaborator struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 func OptionAPIURL(u string) func(*Client) {
@@ -59,6 +68,9 @@ func (api *Client) GetProjects() (*[]Project, error) {
 func (api *Client) GetProjectById(id string) (*Project, error) {
 	return api.GetProjectByIdContext(id, context.Background())
 }
+func (api *Client) GetProjectCollaborators(id string) (*[]Collaborator, error) {
+	return api.GetProjectCollaboratorsContext(id, context.Background())
+}
 
 func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
 	response := &ProjectsResponse{}
@@ -82,4 +94,16 @@ func (api *Client) GetProjectByIdContext(id string, context context.Context) (*P
 		&response.Project)
 
 	return &response.Project, err
+}
+
+func (api *Client) GetProjectCollaboratorsContext(id string, context context.Context) (*[]Collaborator, error) {
+	response := &CollaboratorsResponse{}
+
+	err := api.getMethod(context,
+		"projects/"+id+"/collaborators",
+		api.token,
+		url.Values{},
+		&response.Collaborators)
+
+	return &response.Collaborators, err
 }
