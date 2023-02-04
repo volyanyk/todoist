@@ -1,11 +1,15 @@
 package golang_todoist_api
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -57,6 +61,19 @@ func doPost(ctx context.Context, client httpClient, req *http.Request, parser re
 	return parser(resp)
 }
 
+func postJSON(ctx context.Context, client httpClient, endpoint, token string, json []byte, intf interface{}, d Debug) error {
+	reqBody := bytes.NewBuffer(json)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, reqBody)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("X-Request-ID", uuid.New().String())
+
+	return doPost(ctx, client, req, newJSONParser(intf), d)
+}
+
 func logResponse(resp *http.Response, d Debug) error {
 	if d.Debug() {
 		text, err := httputil.DumpResponse(resp, true)
@@ -91,4 +108,19 @@ func (t TodoistResponse) Err() error {
 	}
 
 	return TodoistErrorResponse{Err: t.Error}
+}
+
+func New(token string, options ...Option) *Client {
+	s := &Client{
+		token:      token,
+		endpoint:   APIURL,
+		httpclient: &http.Client{},
+		log:        log.New(os.Stderr, "volyanyk/golang-todoist-api", log.LstdFlags|log.Lshortfile),
+	}
+
+	for _, opt := range options {
+		opt(s)
+	}
+
+	return s
 }

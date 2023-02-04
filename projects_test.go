@@ -61,6 +61,25 @@ func TestGetProjectCollaborators(t *testing.T) {
 		t.Fatal(ErrIncorrectResponse)
 	}
 }
+func TestPostProject(t *testing.T) {
+	http.HandleFunc("/projects", postTestProject)
+	once.Do(startServer)
+	expectedProject := getTestProjectWithId("1")
+
+	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
+
+	project, err := api.PostProject("1")
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(expectedProject, *project) {
+		t.Fatal(ErrIncorrectResponse)
+	}
+	if err != nil {
+		t.Errorf("Failed, but should have succeeded")
+	}
+}
 
 func getTestProjects() []Project {
 	return []Project{
@@ -132,4 +151,13 @@ func getProjectCollaborators(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+}
+
+func postTestProject(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	response, _ := json.Marshal(ProjectResponse{
+		Project:         getTestProjectWithId("1"),
+		TodoistResponse: TodoistResponse{Ok: true},
+	})
+	w.Write(response)
 }

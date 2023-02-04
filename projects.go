@@ -2,10 +2,8 @@ package golang_todoist_api
 
 import (
 	"context"
-	"log"
-	"net/http"
+	"encoding/json"
 	"net/url"
-	"os"
 )
 
 type Option func(*Client)
@@ -47,21 +45,6 @@ func OptionAPIURL(u string) func(*Client) {
 	return func(c *Client) { c.endpoint = u }
 }
 
-func New(token string, options ...Option) *Client {
-	s := &Client{
-		token:      token,
-		endpoint:   APIURL,
-		httpclient: &http.Client{},
-		log:        log.New(os.Stderr, "volyanyk/golang-todoist-api", log.LstdFlags|log.Lshortfile),
-	}
-
-	for _, opt := range options {
-		opt(s)
-	}
-
-	return s
-}
-
 func (api *Client) GetProjects() (*[]Project, error) {
 	return api.GetProjectsContext(context.Background())
 }
@@ -70,6 +53,9 @@ func (api *Client) GetProjectById(id string) (*Project, error) {
 }
 func (api *Client) GetProjectCollaborators(id string) (*[]Collaborator, error) {
 	return api.GetProjectCollaboratorsContext(id, context.Background())
+}
+func (api *Client) PostProject(name string) (*Project, error) {
+	return api.PostProjectContext(name, context.Background())
 }
 
 func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
@@ -106,4 +92,21 @@ func (api *Client) GetProjectCollaboratorsContext(id string, context context.Con
 		&response.Collaborators)
 
 	return &response.Collaborators, err
+}
+
+func (api *Client) PostProjectContext(name string, context context.Context) (*Project, error) {
+	response := &ProjectResponse{}
+	request, _ := json.Marshal(map[string]string{
+		"name": name,
+	})
+	err := postJSON(context, api.httpclient, api.endpoint+"projects", api.token, request, &response, api)
+
+	if err != nil {
+		return nil, err
+	}
+	if !response.Ok {
+		return nil, response.Err()
+	}
+
+	return &response.Project, nil
 }
