@@ -13,7 +13,7 @@ func TestGetProjects(t *testing.T) {
 	expectedProjects := getTestProjects()
 
 	once.Do(startServer)
-	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
 
 	projects, err := api.GetProjects()
 	if err != nil {
@@ -32,7 +32,7 @@ func TestGetProjectById(t *testing.T) {
 	expectedProject := getTestProjectWithId(id)
 
 	once.Do(startServer)
-	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
 
 	project, err := api.GetProjectById(id)
 	if err != nil {
@@ -50,7 +50,7 @@ func TestGetProjectCollaborators(t *testing.T) {
 	expectedCollaborators := getTestProjectCollaborators()
 
 	once.Do(startServer)
-	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
 
 	collaborators, err := api.GetProjectCollaborators("1")
 	if err != nil {
@@ -66,7 +66,7 @@ func TestPostProject(t *testing.T) {
 	once.Do(startServer)
 	expectedProject := getTestProjectWithId("1")
 
-	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
 
 	project, err := api.AddProject("1")
 	if err != nil {
@@ -86,7 +86,7 @@ func TestPostProjectById(t *testing.T) {
 	once.Do(startServer)
 	expectedProject := getTestProjectWithId("1")
 
-	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
 
 	project, err := api.UpdateProject("1", "name")
 	if err != nil {
