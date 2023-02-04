@@ -54,8 +54,11 @@ func (api *Client) GetProjectById(id string) (*Project, error) {
 func (api *Client) GetProjectCollaborators(id string) (*[]Collaborator, error) {
 	return api.GetProjectCollaboratorsContext(id, context.Background())
 }
-func (api *Client) PostProject(name string) (*Project, error) {
-	return api.PostProjectContext(name, context.Background())
+func (api *Client) AddProject(name string) (*Project, error) {
+	return api.AddProjectContext(name, context.Background())
+}
+func (api *Client) UpdateProject(id string, name string) (*Project, error) {
+	return api.UpdateProjectContext(id, name, context.Background())
 }
 
 func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
@@ -94,12 +97,28 @@ func (api *Client) GetProjectCollaboratorsContext(id string, context context.Con
 	return &response.Collaborators, err
 }
 
-func (api *Client) PostProjectContext(name string, context context.Context) (*Project, error) {
+func (api *Client) AddProjectContext(name string, context context.Context) (*Project, error) {
 	response := &ProjectResponse{}
 	request, _ := json.Marshal(map[string]string{
 		"name": name,
 	})
 	err := postJSON(context, api.httpclient, api.endpoint+"projects", api.token, request, &response, api)
+
+	if err != nil {
+		return nil, err
+	}
+	if !response.Ok {
+		return nil, response.Err()
+	}
+
+	return &response.Project, nil
+}
+func (api *Client) UpdateProjectContext(id string, name string, context context.Context) (*Project, error) {
+	response := &ProjectResponse{}
+	request, _ := json.Marshal(map[string]string{
+		"name": name,
+	})
+	err := postJSON(context, api.httpclient, api.endpoint+"projects/"+id, api.token, request, &response, api)
 
 	if err != nil {
 		return nil, err

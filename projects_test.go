@@ -68,7 +68,27 @@ func TestPostProject(t *testing.T) {
 
 	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
 
-	project, err := api.PostProject("1")
+	project, err := api.AddProject("1")
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(expectedProject, *project) {
+		t.Fatal(ErrIncorrectResponse)
+	}
+	if err != nil {
+		t.Errorf("Failed, but should have succeeded")
+	}
+}
+
+func TestPostProjectById(t *testing.T) {
+	http.HandleFunc("/projects/1", postTestProjectById("1"))
+	once.Do(startServer)
+	expectedProject := getTestProjectWithId("1")
+
+	api := New("testing-token", OptionAPIURL("http://"+serverAddr+"/"))
+
+	project, err := api.UpdateProject("1", "name")
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
@@ -159,5 +179,23 @@ func postTestProject(w http.ResponseWriter, r *http.Request) {
 		Project:         getTestProjectWithId("1"),
 		TodoistResponse: TodoistResponse{Ok: true},
 	})
-	w.Write(response)
+	_, err := w.Write(response)
+	if err != nil {
+		return
+	}
+}
+
+func postTestProjectById(id string) func(rw http.ResponseWriter, r *http.Request) {
+	response, _ := json.Marshal(ProjectResponse{
+		Project:         getTestProjectWithId(id),
+		TodoistResponse: TodoistResponse{Ok: true},
+	})
+
+	return func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Content-Type", "application/json")
+		_, err := rw.Write(response)
+		if err != nil {
+			return
+		}
+	}
 }
