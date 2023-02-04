@@ -101,6 +101,7 @@ func getTestProjectWithId(id string) Project {
 }
 
 func getProjects(rw http.ResponseWriter, r *http.Request) {
+	rw.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(
 		getTestProjects(),
 	)
@@ -115,6 +116,7 @@ func getProjectById(id string) func(rw http.ResponseWriter, r *http.Request) {
 	)
 
 	return func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Content-Type", "application/json")
 		_, err := rw.Write(response)
 		if err != nil {
 			return
@@ -122,6 +124,7 @@ func getProjectById(id string) func(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 func getProjectCollaborators(rw http.ResponseWriter, r *http.Request) {
+	rw.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(
 		getTestProjectCollaborators(),
 	)
