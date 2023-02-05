@@ -48,9 +48,6 @@ func OptionAPIURL(u string) func(*Client) {
 func (api *Client) GetProjects() (*[]Project, error) {
 	return api.GetProjectsContext(context.Background())
 }
-func (api *Client) GetProjectById(id string) (*Project, error) {
-	return api.GetProjectByIdContext(id, context.Background())
-}
 func (api *Client) GetProjectCollaborators(id string) (*[]Collaborator, error) {
 	return api.GetProjectCollaboratorsContext(id, context.Background())
 }
@@ -59,6 +56,12 @@ func (api *Client) AddProject(name string) (*Project, error) {
 }
 func (api *Client) UpdateProject(id string, name string) (*Project, error) {
 	return api.UpdateProjectContext(id, name, context.Background())
+}
+func (api *Client) GetProjectById(id string) (*Project, error) {
+	return api.GetProjectByIdContext(id, context.Background())
+}
+func (api *Client) DeleteProjectById(id string) (*TodoistResponse, error) {
+	return api.DeleteProjectByIdContext(id, context.Background())
 }
 
 func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
@@ -71,18 +74,6 @@ func (api *Client) GetProjectsContext(context context.Context) (*[]Project, erro
 		&response.Projects)
 
 	return &response.Projects, err
-}
-
-func (api *Client) GetProjectByIdContext(id string, context context.Context) (*Project, error) {
-	response := &ProjectResponse{}
-
-	err := api.getMethod(context,
-		"projects/"+id,
-		api.token,
-		url.Values{},
-		&response.Project)
-
-	return &response.Project, err
 }
 
 func (api *Client) GetProjectCollaboratorsContext(id string, context context.Context) (*[]Collaborator, error) {
@@ -102,7 +93,7 @@ func (api *Client) AddProjectContext(name string, context context.Context) (*Pro
 	request, _ := json.Marshal(map[string]string{
 		"name": name,
 	})
-	err := postJSON(context, api.httpclient, api.endpoint+"projects", api.token, request, &response, api)
+	err := performPost(context, api.httpclient, api.endpoint+"projects", api.token, request, &response, api)
 
 	if err != nil {
 		return nil, err
@@ -113,12 +104,13 @@ func (api *Client) AddProjectContext(name string, context context.Context) (*Pro
 
 	return &response.Project, nil
 }
+
 func (api *Client) UpdateProjectContext(id string, name string, context context.Context) (*Project, error) {
 	response := &ProjectResponse{}
 	request, _ := json.Marshal(map[string]string{
 		"name": name,
 	})
-	err := postJSON(context, api.httpclient, api.endpoint+"projects/"+id, api.token, request, &response, api)
+	err := performPost(context, api.httpclient, api.endpoint+"projects/"+id, api.token, request, &response, api)
 
 	if err != nil {
 		return nil, err
@@ -128,4 +120,27 @@ func (api *Client) UpdateProjectContext(id string, name string, context context.
 	}
 
 	return &response.Project, nil
+}
+func (api *Client) GetProjectByIdContext(id string, context context.Context) (*Project, error) {
+	response := &ProjectResponse{}
+
+	err := api.getMethod(context,
+		"projects/"+id,
+		api.token,
+		url.Values{},
+		&response.Project)
+
+	return &response.Project, err
+}
+func (api *Client) DeleteProjectByIdContext(id string, context context.Context) (*TodoistResponse, error) {
+	response := &TodoistResponse{}
+
+	err := performDelete(context,
+		api.httpclient,
+		api.endpoint+"projects/"+id,
+		api.token,
+		response,
+		api)
+
+	return response, err
 }

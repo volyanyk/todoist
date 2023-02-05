@@ -1,7 +1,6 @@
 package golang_todoist_api
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -12,8 +11,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type responseParser func(*http.Response) error
@@ -24,7 +21,7 @@ type TodoistErrorResponse struct {
 
 func (t TodoistErrorResponse) Error() string { return t.Err }
 
-func checkStatusCode(resp *http.Response, d Debug) error {
+func checkStatusCode(method string, resp *http.Response, d Debug) error {
 	if resp.StatusCode == http.StatusTooManyRequests {
 		retry, err := strconv.ParseInt(resp.Header.Get("Retry-After"), 10, 64)
 		if err != nil {
@@ -32,19 +29,26 @@ func checkStatusCode(resp *http.Response, d Debug) error {
 		}
 		return &RateLimitedError{time.Duration(retry) * time.Second}
 	}
-
-	if resp.StatusCode != http.StatusOK {
+	if method == http.MethodDelete && resp.StatusCode != http.StatusNoContent {
 		err := logResponse(resp, d)
 		if err != nil {
 			return err
 		}
 		return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+	} else {
+		if resp.StatusCode != http.StatusOK {
+			err := logResponse(resp, d)
+			if err != nil {
+				return err
+			}
+			return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+		}
 	}
 
 	return nil
 }
 
-func doPost(ctx context.Context, client httpClient, req *http.Request, parser responseParser, d Debug) error {
+func perform(ctx context.Context, client httpClient, req *http.Request, parser responseParser, d Debug) error {
 	resp, err := client.Do(req)
 
 	if err != nil {
@@ -57,22 +61,9 @@ func doPost(ctx context.Context, client httpClient, req *http.Request, parser re
 		}
 	}(resp.Body)
 
-	err = checkStatusCode(resp, d)
+	err = checkStatusCode(req.Method, resp, d)
 
 	return parser(resp)
-}
-
-func postJSON(ctx context.Context, client httpClient, endpoint, token string, json []byte, intf interface{}, d Debug) error {
-	reqBody := bytes.NewBuffer(json)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, reqBody)
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	req.Header.Set("X-Request-ID", uuid.New().String())
-
-	return doPost(ctx, client, req, newJSONParser(intf), d)
 }
 
 func logResponse(resp *http.Response, d Debug) error {

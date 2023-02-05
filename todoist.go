@@ -1,11 +1,14 @@
 package golang_todoist_api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -51,10 +54,23 @@ type httpClient interface {
 }
 
 func (api *Client) getMethod(ctx context.Context, path string, token string, values url.Values, intf interface{}) error {
-	return getResource(ctx, api.httpclient, api.endpoint+path, token, values, intf, api)
+	return performGet(ctx, api.httpclient, api.endpoint+path, token, values, intf, api)
 }
 
-func getResource(ctx context.Context, client httpClient, endpoint, token string, values url.Values, intf interface{}, d Debug) error {
+func performPost(ctx context.Context, client httpClient, endpoint, token string, json []byte, intf interface{}, d Debug) error {
+	reqBody := bytes.NewBuffer(json)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, reqBody)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("X-Request-ID", uuid.New().String())
+
+	return perform(ctx, client, req, newJSONParser(intf), d)
+}
+
+func performGet(ctx context.Context, client httpClient, endpoint, token string, values url.Values, intf interface{}, d Debug) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return err
@@ -63,7 +79,15 @@ func getResource(ctx context.Context, client httpClient, endpoint, token string,
 
 	req.URL.RawQuery = values.Encode()
 
-	return doPost(ctx, client, req, newJSONParser(intf), d)
+	return perform(ctx, client, req, newJSONParser(intf), d)
+}
+func performDelete(ctx context.Context, client httpClient, endpoint, token string, intf interface{}, d Debug) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	return perform(ctx, client, req, newJSONParser(intf), d)
 }
 
 func newJSONParser(dst interface{}) responseParser {

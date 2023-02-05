@@ -101,6 +101,25 @@ func TestPostProjectById(t *testing.T) {
 	}
 }
 
+func TestDeleteProjectById(t *testing.T) {
+	http.DefaultServeMux = new(http.ServeMux)
+	var id = "1"
+	http.HandleFunc("/projects/"+id, getDeleteProjectByIdResponse)
+	expectedResponse := getTestDeleteProjectByIdResponse()
+
+	once.Do(startServer)
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
+
+	response, err := api.DeleteProjectById(id)
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(expectedResponse, *response) {
+		t.Fatal(ErrIncorrectResponse)
+	}
+}
+
 func getTestProjects() []Project {
 	return []Project{
 		getTestProjectWithId("12345"),
@@ -136,6 +155,13 @@ func getTestProjectWithId(id string) Project {
 		IsTeamInbox:    false,
 		Url:            "",
 		ViewStyle:      "",
+	}
+}
+
+func getTestDeleteProjectByIdResponse() TodoistResponse {
+	return TodoistResponse{
+		Ok:    true,
+		Error: "",
 	}
 }
 
@@ -197,5 +223,16 @@ func postTestProjectById(id string) func(rw http.ResponseWriter, r *http.Request
 		if err != nil {
 			return
 		}
+	}
+}
+func getDeleteProjectByIdResponse(rw http.ResponseWriter, r *http.Request) {
+	response, _ := json.Marshal(TodoistResponse{
+		Ok:    true,
+		Error: "",
+	})
+
+	_, err := rw.Write(response)
+	if err != nil {
+		return
 	}
 }
