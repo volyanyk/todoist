@@ -116,3 +116,9 @@ func New(token string, options ...Option) *Client {
 
 	return s
 }
+
+func OptionAPIURL(u string) func(*Client) {
+	return func(c *Client) { c.endpoint = u }
+}
+
+type Option func(*Client)

@@ -6,8 +6,6 @@ import (
 	"net/url"
 )
 
-type Option func(*Client)
-
 type ProjectsResponse struct {
 	Projects []Project
 	TodoistResponse
@@ -39,10 +37,6 @@ type Collaborator struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
-}
-
-func OptionAPIURL(u string) func(*Client) {
-	return func(c *Client) { c.endpoint = u }
 }
 
 func (api *Client) GetProjects() (*[]Project, error) {
