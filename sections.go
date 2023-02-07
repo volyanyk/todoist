@@ -27,8 +27,8 @@ type SectionParameters struct {
 	Name      string
 }
 
-func (api *Client) GetSectionsByProjectId(param *SectionParameters) (*[]Section, error) {
-	return api.GetSectionsByProjectIdContext(param, context.Background())
+func (api *Client) GetSectionsByProjectId(projectId string) (*[]Section, error) {
+	return api.GetSectionsByProjectIdContext(projectId, context.Background())
 }
 func (api *Client) AddSection(param *SectionParameters) (*Section, error) {
 	return api.AddSectionContext(param, context.Background())
@@ -43,10 +43,10 @@ func (api *Client) DeleteSectionById(id string) (*TodoistResponse, error) {
 	return api.DeleteSectionByIdContext(id, context.Background())
 }
 
-func (api *Client) GetSectionsByProjectIdContext(params *SectionParameters, context context.Context) (*[]Section, error) {
+func (api *Client) GetSectionsByProjectIdContext(projectId string, context context.Context) (*[]Section, error) {
 	response := &SectionsResponse{}
 	values := url.Values{
-		"project_id": {params.ProjectId},
+		"project_id": {projectId},
 	}
 	err := api.getMethod(context,
 		"sections",
