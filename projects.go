@@ -39,17 +39,31 @@ type Collaborator struct {
 	Email string `json:"email"`
 }
 
+type AddProjectRequest struct {
+	Name       string `json:"name"`        // Required
+	ParentId   string `json:"parent_id"`   // Optional
+	Color      string `json:"color"`       // Optional
+	IsFavorite bool   `json:"is_favorite"` // Optional
+	ViewStyle  string `json:"view_style"`  // Optional
+}
+type UpdateProjectRequest struct {
+	Name       string `json:"name"`        // Required
+	Color      string `json:"color"`       // Optional
+	IsFavorite bool   `json:"is_favorite"` // Optional
+	ViewStyle  string `json:"view_style"`  // Optional
+}
+
 func (api *Client) GetProjects() (*[]Project, error) {
 	return api.GetProjectsContext(context.Background())
 }
 func (api *Client) GetProjectCollaborators(id string) (*[]Collaborator, error) {
 	return api.GetProjectCollaboratorsContext(id, context.Background())
 }
-func (api *Client) AddProject(name string) (*Project, error) {
-	return api.AddProjectContext(name, context.Background())
+func (api *Client) AddProject(request AddProjectRequest) (*Project, error) {
+	return api.AddProjectContext(request, context.Background())
 }
-func (api *Client) UpdateProject(id string, name string) (*Project, error) {
-	return api.UpdateProjectContext(id, name, context.Background())
+func (api *Client) UpdateProject(id string, updateProjectRequest UpdateProjectRequest) (*Project, error) {
+	return api.UpdateProjectContext(id, updateProjectRequest, context.Background())
 }
 func (api *Client) GetProjectById(id string) (*Project, error) {
 	return api.GetProjectByIdContext(id, context.Background())
@@ -82,12 +96,12 @@ func (api *Client) GetProjectCollaboratorsContext(id string, context context.Con
 	return &response.Collaborators, err
 }
 
-func (api *Client) AddProjectContext(name string, context context.Context) (*Project, error) {
+func (api *Client) AddProjectContext(addProjectRequest AddProjectRequest, context context.Context) (*Project, error) {
 	response := &ProjectResponse{}
-	request, _ := json.Marshal(map[string]string{
-		"name": name,
-	})
-	err := performPost(context, api.httpclient, api.endpoint+"projects", api.token, request, &response, api)
+
+	request, err := json.Marshal(addProjectRequest)
+
+	err = performPost(context, api.httpclient, api.endpoint+"projects", api.token, request, &response, api)
 
 	if err != nil {
 		return nil, err
@@ -99,11 +113,9 @@ func (api *Client) AddProjectContext(name string, context context.Context) (*Pro
 	return &response.Project, nil
 }
 
-func (api *Client) UpdateProjectContext(id string, name string, context context.Context) (*Project, error) {
+func (api *Client) UpdateProjectContext(id string, updateProjectRequest UpdateProjectRequest, context context.Context) (*Project, error) {
 	response := &ProjectResponse{}
-	request, _ := json.Marshal(map[string]string{
-		"name": name,
-	})
+	request, _ := json.Marshal(updateProjectRequest)
 	err := performPost(context, api.httpclient, api.endpoint+"projects/"+id, api.token, request, &response, api)
 
 	if err != nil {

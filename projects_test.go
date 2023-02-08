@@ -67,8 +67,10 @@ func TestPostProject(t *testing.T) {
 	expectedProject := getTestProjectWithId("1")
 
 	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
-
-	project, err := api.AddProject("1")
+	request1 := AddProjectRequest{
+		Name: "name",
+	}
+	project, err := api.AddProject(request1)
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
@@ -87,8 +89,10 @@ func TestPostProjectById(t *testing.T) {
 	expectedProject := getTestProjectWithId("1")
 
 	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
-
-	project, err := api.UpdateProject("1", "name")
+	request := UpdateProjectRequest{
+		Name: "name",
+	}
+	project, err := api.UpdateProject("1", request)
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
