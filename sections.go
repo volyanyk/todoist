@@ -23,8 +23,9 @@ type Section struct {
 }
 
 type SectionParameters struct {
-	ProjectId string
-	Name      string
+	ProjectId string `json:"project_id"`
+	Name      string `json:"name"`
+	Order     int    `json:"order"`
 }
 
 func (api *Client) GetSectionsByProjectId(projectId string) (*[]Section, error) {
@@ -71,10 +72,7 @@ func (api *Client) GetSectionCollaboratorsContext(id string, context context.Con
 
 func (api *Client) AddSectionContext(params *SectionParameters, context context.Context) (*Section, error) {
 	response := &SectionResponse{}
-	request, _ := json.Marshal(map[string]string{
-		"project_id": params.ProjectId,
-		"name":       params.Name,
-	})
+	request, _ := json.Marshal(params)
 	err := performPost(context, api.httpclient, api.endpoint+"sections", api.token, request, &response, api)
 
 	if err != nil {
