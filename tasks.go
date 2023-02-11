@@ -90,11 +90,11 @@ func (api *Client) GetActiveTaskById(id string) (*Task, error) {
 func (api *Client) UpdateTask(id string, updateTaskRequest UpdateTaskRequest) (*Task, error) {
 	return api.UpdateTaskContext(id, updateTaskRequest, context.Background())
 }
-func (api *Client) CloseTask(id string) (*Task, error) {
+func (api *Client) CloseTask(id string) (*TodoistResponse, error) {
 	return api.CloseTaskContext(id, context.Background())
 }
-func (api *Client) ReopenTask(id string) (*Task, error) {
-	return api.CloseTaskContext(id, context.Background())
+func (api *Client) ReopenTask(id string) (*TodoistResponse, error) {
+	return api.ReopenTaskContext(id, context.Background())
 }
 func (api *Client) DeleteTaskById(id string) (*TodoistResponse, error) {
 	return api.DeleteTaskByIdContext(id, context.Background())
@@ -161,9 +161,9 @@ func (api *Client) UpdateTaskContext(id string, updateTaskRequest UpdateTaskRequ
 
 	return &response.Task, nil
 }
-func (api *Client) CloseTaskContext(id string, context context.Context) (*Task, error) {
-	response := &TaskResponse{}
-	err := performPost(context, api.httpclient, api.endpoint+"tasks/"+id+"/close", api.token, nil, &response, api)
+func (api *Client) CloseTaskContext(id string, context context.Context) (*TodoistResponse, error) {
+	response := &TodoistResponse{}
+	err := performPostWithoutResponse(context, api.httpclient, api.endpoint+"tasks/"+id+"/close", api.token, &response, api)
 
 	if err != nil {
 		return nil, err
@@ -172,11 +172,11 @@ func (api *Client) CloseTaskContext(id string, context context.Context) (*Task, 
 		return nil, response.Err()
 	}
 
-	return &response.Task, nil
+	return response, err
 }
-func (api *Client) ReopenTaskContext(id string, context context.Context) (*Task, error) {
-	response := &TaskResponse{}
-	err := performPost(context, api.httpclient, api.endpoint+"tasks/"+id+"/reopen", api.token, nil, &response, api)
+func (api *Client) ReopenTaskContext(id string, context context.Context) (*TodoistResponse, error) {
+	response := &TodoistResponse{}
+	err := performPostWithoutResponse(context, api.httpclient, api.endpoint+"tasks/"+id+"/reopen", api.token, &response, api)
 
 	if err != nil {
 		return nil, err
@@ -185,7 +185,7 @@ func (api *Client) ReopenTaskContext(id string, context context.Context) (*Task,
 		return nil, response.Err()
 	}
 
-	return &response.Task, nil
+	return response, err
 }
 func (api *Client) DeleteTaskByIdContext(id string, context context.Context) (*TodoistResponse, error) {
 	response := &TodoistResponse{}

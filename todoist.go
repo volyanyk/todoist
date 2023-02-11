@@ -64,10 +64,17 @@ func performPost(ctx context.Context, client httpClient, endpoint, token string,
 		return err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	if json != nil {
-		req.Header.Set("X-Request-ID", uuid.New().String())
-		req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
+	req.Header.Set("Content-Type", "application/json")
+
+	return perform(ctx, client, req, newJSONParser(intf), d)
+}
+func performPostWithoutResponse(ctx context.Context, client httpClient, endpoint, token string, intf interface{}, d Debug) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, nil)
+	if err != nil {
+		return err
 	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	return perform(ctx, client, req, newJSONParser(intf), d)
 }
