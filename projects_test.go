@@ -169,7 +169,7 @@ func getTestDeleteProjectByIdResponse() TodoistResponse {
 	}
 }
 
-func getProjects(rw http.ResponseWriter, r *http.Request) {
+func getProjects(rw http.ResponseWriter, _ *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(
 		getTestProjects(),
@@ -192,7 +192,7 @@ func getProjectById(id string) func(rw http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-func getProjectCollaborators(rw http.ResponseWriter, r *http.Request) {
+func getProjectCollaborators(rw http.ResponseWriter, _ *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(
 		getTestProjectCollaborators(),
@@ -203,7 +203,7 @@ func getProjectCollaborators(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func postTestProject(w http.ResponseWriter, r *http.Request) {
+func postTestProject(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(ProjectResponse{
 		Project:         getTestProjectWithId("1"),
@@ -229,7 +229,7 @@ func postTestProjectById(id string) func(rw http.ResponseWriter, r *http.Request
 		}
 	}
 }
-func getDeleteProjectByIdResponse(rw http.ResponseWriter, r *http.Request) {
+func getDeleteProjectByIdResponse(rw http.ResponseWriter, _ *http.Request) {
 	response, _ := json.Marshal(TodoistResponse{
 		Ok:    true,
 		Error: "",

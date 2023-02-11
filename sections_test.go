@@ -114,7 +114,7 @@ func getTestDeleteSectionByIdResponse() TodoistResponse {
 	}
 }
 
-func getDeleteSectionByIdResponse(writer http.ResponseWriter, request *http.Request) {
+func getDeleteSectionByIdResponse(writer http.ResponseWriter, _ *http.Request) {
 	response, _ := json.Marshal(TodoistResponse{
 		Ok:    true,
 		Error: "",
@@ -126,7 +126,7 @@ func getDeleteSectionByIdResponse(writer http.ResponseWriter, request *http.Requ
 	}
 }
 
-func getSectionsByProjectId(rw http.ResponseWriter, r *http.Request) {
+func getSectionsByProjectId(rw http.ResponseWriter, _ *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 
 	response, _ := json.Marshal(
@@ -181,7 +181,7 @@ func getTestSectionById(id string) Section {
 	}
 }
 
-func addSection(writer http.ResponseWriter, request *http.Request) {
+func addSection(writer http.ResponseWriter, _ *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(SectionResponse{
 		Section:         getTestSectionByProjectIdAndName("0", "1"),

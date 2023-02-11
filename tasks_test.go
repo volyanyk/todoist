@@ -210,7 +210,7 @@ func getTestOkResponse() TodoistResponse {
 	}
 }
 
-func getTasks(rw http.ResponseWriter, r *http.Request) {
+func getTasks(rw http.ResponseWriter, _ *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(
 		getTestTasks(),
@@ -234,7 +234,7 @@ func getTaskById(id string) func(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func postTestTask(w http.ResponseWriter, r *http.Request) {
+func postTestTask(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(TaskResponse{
 		Task:            getTestTaskWithId("1"),
@@ -260,7 +260,7 @@ func addTestTaskById(id string) func(rw http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-func getOkResponse(rw http.ResponseWriter, r *http.Request) {
+func getOkResponse(rw http.ResponseWriter, _ *http.Request) {
 	response, _ := json.Marshal(TodoistResponse{
 		Ok:    true,
 		Error: "",
