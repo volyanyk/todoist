@@ -63,9 +63,11 @@ func performPost(ctx context.Context, client httpClient, endpoint, token string,
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	req.Header.Set("X-Request-ID", uuid.New().String())
+	if json != nil {
+		req.Header.Set("X-Request-ID", uuid.New().String())
+		req.Header.Set("Content-Type", "application/json")
+	}
 
 	return perform(ctx, client, req, newJSONParser(intf), d)
 }

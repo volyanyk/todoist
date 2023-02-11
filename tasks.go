@@ -66,12 +66,38 @@ type GetActiveTasksRequest struct {
 	Lang      string   `json:"lang"`       // Optional
 	Ids       []string `json:"ids"`        // Optional
 }
+type UpdateTaskRequest struct {
+	Content     string   `json:"content"`      // Optional
+	Description string   `json:"description"`  // Optional
+	Labels      []string `json:"labels"`       // Optional
+	Priority    int      `json:"priority"`     // Optional
+	DueString   string   `json:"due_string"`   // Optional
+	DueDate     string   `json:"due_date"`     // Optional
+	DueDatetime string   `json:"due_datetime"` // Optional
+	DueLang     string   `json:"due_lang"`     // Optional
+	AssigneeId  string   `json:"assignee_id"`  // Optional
+}
 
 func (api *Client) GetActiveTasks(getActiveTasksRequest GetActiveTasksRequest) (*[]Task, error) {
 	return api.GetActiveTasksContext(getActiveTasksRequest, context.Background())
 }
 func (api *Client) AddTask(request AddTaskRequest) (*Task, error) {
 	return api.AddTaskContext(request, context.Background())
+}
+func (api *Client) GetActiveTaskById(id string) (*Task, error) {
+	return api.GetActiveTaskByIdContext(id, context.Background())
+}
+func (api *Client) UpdateTask(id string, updateTaskRequest UpdateTaskRequest) (*Task, error) {
+	return api.UpdateTaskContext(id, updateTaskRequest, context.Background())
+}
+func (api *Client) CloseTask(id string) (*Task, error) {
+	return api.CloseTaskContext(id, context.Background())
+}
+func (api *Client) ReopenTask(id string) (*Task, error) {
+	return api.CloseTaskContext(id, context.Background())
+}
+func (api *Client) DeleteTaskById(id string) (*TodoistResponse, error) {
+	return api.DeleteTaskByIdContext(id, context.Background())
 }
 
 func (api *Client) GetActiveTasksContext(request GetActiveTasksRequest, context context.Context) (*[]Task, error) {
@@ -109,4 +135,67 @@ func (api *Client) AddTaskContext(addTaskRequest AddTaskRequest, context context
 	}
 
 	return &response.Task, nil
+}
+func (api *Client) GetActiveTaskByIdContext(id string, context context.Context) (*Task, error) {
+	response := &TaskResponse{}
+
+	err := api.getMethod(context,
+		"tasks/"+id,
+		api.token,
+		url.Values{},
+		&response.Task)
+
+	return &response.Task, err
+}
+func (api *Client) UpdateTaskContext(id string, updateTaskRequest UpdateTaskRequest, context context.Context) (*Task, error) {
+	response := &TaskResponse{}
+	request, _ := json.Marshal(updateTaskRequest)
+	err := performPost(context, api.httpclient, api.endpoint+"tasks/"+id, api.token, request, &response, api)
+
+	if err != nil {
+		return nil, err
+	}
+	if !response.Ok {
+		return nil, response.Err()
+	}
+
+	return &response.Task, nil
+}
+func (api *Client) CloseTaskContext(id string, context context.Context) (*Task, error) {
+	response := &TaskResponse{}
+	err := performPost(context, api.httpclient, api.endpoint+"tasks/"+id+"/close", api.token, nil, &response, api)
+
+	if err != nil {
+		return nil, err
+	}
+	if !response.Ok {
+		return nil, response.Err()
+	}
+
+	return &response.Task, nil
+}
+func (api *Client) ReopenTaskContext(id string, context context.Context) (*Task, error) {
+	response := &TaskResponse{}
+	err := performPost(context, api.httpclient, api.endpoint+"tasks/"+id+"/reopen", api.token, nil, &response, api)
+
+	if err != nil {
+		return nil, err
+	}
+	if !response.Ok {
+		return nil, response.Err()
+	}
+
+	return &response.Task, nil
+}
+func (api *Client) DeleteTaskByIdContext(id string, context context.Context) (*TodoistResponse, error) {
+	response := &TodoistResponse{}
+
+	err := performDelete(context,
+		api.httpclient,
+		api.endpoint+"tasks/"+id,
+		api.token,
+		response,
+		api)
+
+	return response, err
 }
