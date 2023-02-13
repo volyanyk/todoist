@@ -67,7 +67,7 @@ func performPost(ctx context.Context, client httpClient, endpoint, token string,
 	req.Header.Set("X-Request-ID", uuid.New().String())
 	req.Header.Set("Content-Type", "application/json")
 
-	return perform(ctx, client, req, newJSONParser(intf), d)
+	return perform(client, req, newJSONParser(intf), d)
 }
 func performPostWithoutResponse(ctx context.Context, client httpClient, endpoint, token string, intf interface{}, d Debug) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, nil)
@@ -76,7 +76,7 @@ func performPostWithoutResponse(ctx context.Context, client httpClient, endpoint
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
-	return perform(ctx, client, req, newJSONParser(intf), d)
+	return perform(client, req, newJSONParser(intf), d)
 }
 
 func performGet(ctx context.Context, client httpClient, endpoint, token string, values url.Values, intf interface{}, d Debug) error {
@@ -88,7 +88,7 @@ func performGet(ctx context.Context, client httpClient, endpoint, token string, 
 
 	req.URL.RawQuery = values.Encode()
 
-	return perform(ctx, client, req, newJSONParser(intf), d)
+	return perform(client, req, newJSONParser(intf), d)
 }
 func performDelete(ctx context.Context, client httpClient, endpoint, token string, intf interface{}, d Debug) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
@@ -96,7 +96,7 @@ func performDelete(ctx context.Context, client httpClient, endpoint, token strin
 		return err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	return perform(ctx, client, req, newJSONParser(intf), d)
+	return perform(client, req, newJSONParser(intf), d)
 }
 
 func newJSONParser(dst interface{}) responseParser {

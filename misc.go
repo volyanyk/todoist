@@ -1,7 +1,6 @@
 package golang_todoist_api
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"log"
@@ -35,6 +34,14 @@ func checkStatusCode(method string, resp *http.Response, d Debug) error {
 			return err
 		}
 		return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+	}
+	if method == http.MethodPost && ((resp.StatusCode != http.StatusOK) && (resp.StatusCode != http.StatusNoContent)) {
+		err := logResponse(resp, d)
+		if err != nil {
+			return err
+		}
+		return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+
 	} else {
 		if resp.StatusCode != http.StatusOK {
 			err := logResponse(resp, d)
@@ -48,7 +55,7 @@ func checkStatusCode(method string, resp *http.Response, d Debug) error {
 	return nil
 }
 
-func perform(ctx context.Context, client httpClient, req *http.Request, parser responseParser, d Debug) error {
+func perform(client httpClient, req *http.Request, parser responseParser, d Debug) error {
 	resp, err := client.Do(req)
 
 	if err != nil {
