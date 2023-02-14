@@ -84,6 +84,44 @@ func TestPostLabel(t *testing.T) {
 		t.Errorf("Failed, but should have succeeded")
 	}
 }
+func TestPostLabelByName(t *testing.T) {
+	http.HandleFunc("/labels/shared/rename", postLabelNewName())
+	once.Do(startServer)
+	expectedProject := getTestLabelByName()
+
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
+
+	project, err := api.RenameLabel("name0", "name1")
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(expectedProject, *project) {
+		t.Fatal(ErrIncorrectResponse)
+	}
+	if err != nil {
+		t.Errorf("Failed, but should have succeeded")
+	}
+}
+func TestPostSharedLabelByName(t *testing.T) {
+	http.HandleFunc("/labels/shared/remove", postLabelNewName())
+	once.Do(startServer)
+	expectedProject := getTestLabelByName()
+
+	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
+
+	project, err := api.RemoveSharedLabel("name0")
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+	if !reflect.DeepEqual(expectedProject, *project) {
+		t.Fatal(ErrIncorrectResponse)
+	}
+	if err != nil {
+		t.Errorf("Failed, but should have succeeded")
+	}
+}
 
 func TestPostLabelById(t *testing.T) {
 	http.HandleFunc("/projects/1", postTestProjectById("1"))
@@ -143,6 +181,13 @@ func getTestLabelWithId(id string) Label {
 	}
 }
 
+func getTestLabelByName() TodoistResponse {
+	return TodoistResponse{
+		Ok:    true,
+		Error: "",
+	}
+}
+
 func getTestDeleteLabelByIdResponse() TodoistResponse {
 	return TodoistResponse{
 		Ok:    true,
@@ -173,6 +218,21 @@ func getLabelById(id string) func(rw http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+func postLabelNewName() func(w http.ResponseWriter, r *http.Request) {
+
+	response, _ := json.Marshal(TodoistResponse{
+		Ok:    true,
+		Error: "",
+	})
+
+	return func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Content-Type", "application/json")
+		_, err := rw.Write(response)
+		if err != nil {
+			return
+		}
+	}
+}
 
 func postTestLabel(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -186,20 +246,6 @@ func postTestLabel(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func postTestLabelById(id string) func(rw http.ResponseWriter, r *http.Request) {
-	response, _ := json.Marshal(LabelResponse{
-		Label:           getTestLabelWithId(id),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
-
-	return func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Set("Content-Type", "application/json")
-		_, err := rw.Write(response)
-		if err != nil {
-			return
-		}
-	}
-}
 func getDeleteLabelByIdResponse(rw http.ResponseWriter, _ *http.Request) {
 	response, _ := json.Marshal(TodoistResponse{
 		Ok:    true,

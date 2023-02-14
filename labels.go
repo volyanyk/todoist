@@ -42,10 +42,10 @@ func (api *Client) AddLabel(request LabelRequest) (*Label, error) {
 func (api *Client) UpdateLabel(id string, request LabelRequest) (*Label, error) {
 	return api.UpdateLabelContext(id, request, context.Background())
 }
-func (api *Client) RenameLabel(oldName string, newName string) (*Label, error) {
+func (api *Client) RenameLabel(oldName string, newName string) (*TodoistResponse, error) {
 	return api.RenameLabelContext(oldName, newName, context.Background())
 }
-func (api *Client) RemoveSharedLabel(name string) (*Label, error) {
+func (api *Client) RemoveSharedLabel(name string) (*TodoistResponse, error) {
 	return api.RemoveSharedLabelContext(name, context.Background())
 }
 func (api *Client) GetLabelById(id string) (*Label, error) {
@@ -109,8 +109,8 @@ func (api *Client) UpdateLabelContext(id string, updateLabelRequest LabelRequest
 
 	return &response.Label, nil
 }
-func (api *Client) RenameLabelContext(oldName string, newName string, context context.Context) (*Label, error) {
-	response := &LabelResponse{}
+func (api *Client) RenameLabelContext(oldName string, newName string, context context.Context) (*TodoistResponse, error) {
+	response := &TodoistResponse{}
 	request, _ := json.Marshal(map[string]string{
 		"name":     oldName,
 		"new_name": newName,
@@ -124,10 +124,10 @@ func (api *Client) RenameLabelContext(oldName string, newName string, context co
 		return nil, response.Err()
 	}
 
-	return &response.Label, nil
+	return response, nil
 }
-func (api *Client) RemoveSharedLabelContext(name string, context context.Context) (*Label, error) {
-	response := &LabelResponse{}
+func (api *Client) RemoveSharedLabelContext(name string, context context.Context) (*TodoistResponse, error) {
+	response := &TodoistResponse{}
 	request, _ := json.Marshal(map[string]string{
 		"name": name,
 	})
@@ -140,7 +140,7 @@ func (api *Client) RemoveSharedLabelContext(name string, context context.Context
 		return nil, response.Err()
 	}
 
-	return &response.Label, nil
+	return response, nil
 }
 func (api *Client) GetLabelByIdContext(id string, context context.Context) (*Label, error) {
 	response := &LabelResponse{}
