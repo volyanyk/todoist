@@ -1,4 +1,4 @@
-module github.com/volyanyk/golang-todoist-api
+module github.com/volyanyk/todoist
 
 go 1.19
 
