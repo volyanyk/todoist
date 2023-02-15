@@ -1,4 +1,4 @@
-package golang_todoist_api
+package todoist
 
 import (
 	"context"

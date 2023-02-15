@@ -1,4 +1,4 @@
-package golang_todoist_api
+package todoist
 
 import (
 	"fmt"
@@ -14,13 +14,16 @@ import (
 
 type responseParser func(*http.Response) error
 
-type TodoistErrorResponse struct {
+type ErrorResponse struct {
 	Err string
 }
 
-func (t TodoistErrorResponse) Error() string { return t.Err }
+func (t ErrorResponse) Error() string { return t.Err }
 
 func checkStatusCode(method string, resp *http.Response, d Debug) error {
+	if resp.StatusCode == http.StatusUnauthorized {
+		return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+	}
 	if resp.StatusCode == http.StatusTooManyRequests {
 		retry, err := strconv.ParseInt(resp.Header.Get("Retry-After"), 10, 64)
 		if err != nil {
@@ -28,12 +31,10 @@ func checkStatusCode(method string, resp *http.Response, d Debug) error {
 		}
 		return &RateLimitedError{time.Duration(retry) * time.Second}
 	}
-	if method == http.MethodDelete && resp.StatusCode != http.StatusNoContent {
-		err := logResponse(resp, d)
-		if err != nil {
-			return err
-		}
-		return StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+	if method == http.MethodDelete && resp.StatusCode == http.StatusOK {
+		resp.Status = http.StatusText(http.StatusNoContent)
+		resp.StatusCode = http.StatusNoContent
+		return nil
 	}
 	if method == http.MethodPost && ((resp.StatusCode != http.StatusOK) && (resp.StatusCode != http.StatusNoContent)) {
 		err := logResponse(resp, d)
@@ -69,6 +70,9 @@ func perform(client httpClient, req *http.Request, parser responseParser, d Debu
 	}(resp.Body)
 
 	err = checkStatusCode(req.Method, resp, d)
+	if err != nil {
+		return err
+	}
 
 	return parser(resp)
 }
@@ -106,7 +110,7 @@ func (t TodoistResponse) Err() error {
 		return nil
 	}
 
-	return TodoistErrorResponse{Err: t.Error}
+	return ErrorResponse{Err: t.Error}
 }
 
 func New(token string, options ...Option) *Client {
@@ -114,7 +118,7 @@ func New(token string, options ...Option) *Client {
 		token:      token,
 		endpoint:   APIURL,
 		httpclient: &http.Client{},
-		log:        log.New(os.Stderr, "volyanyk/golang-todoist-api", log.LstdFlags|log.Lshortfile),
+		log:        log.New(os.Stderr, "volyanyk/todoist", log.LstdFlags|log.Lshortfile),
 	}
 
 	for _, opt := range options {
