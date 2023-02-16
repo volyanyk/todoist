@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	todoist "github.com/volyanyk/todoist"
+	"github.com/volyanyk/todoist"
 )
 
 func main() {
