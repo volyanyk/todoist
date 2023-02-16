@@ -1,8 +1,3 @@
-Todoist API in Go
-===============
-This library supports most if not all of the `developer.todoist.com/rest/v2` REST
-calls.
-
 Todoist API in Go [![Go Reference](https://pkg.go.dev/badge/github.com/volyanyk/todoist.svg)](https://pkg.go.dev/github.com/volyanyk/todoist)
 ===============
 
