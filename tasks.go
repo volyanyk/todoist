@@ -108,7 +108,9 @@ func (api *Client) GetActiveTasksContext(request GetActiveTasksRequest, context 
 		"label":      {request.Label},
 		"filter":     {request.Filter},
 		"lang":       {request.Lang},
-		"ids":        {strings.Join(request.Ids, ",")},
+	}
+	if len(request.Ids) > 0 {
+		values.Add("ids", strings.Join(request.Ids, ","))
 	}
 
 	err := api.getMethod(context,
