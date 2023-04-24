@@ -75,7 +75,7 @@ func (api *Client) DeleteProjectById(id string) (*TodoistResponse, error) {
 func (api *Client) GetProjectsContext(context context.Context) (*[]Project, error) {
 	response := &ProjectsResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"projects",
 		api.token,
 		url.Values{},
@@ -87,7 +87,7 @@ func (api *Client) GetProjectsContext(context context.Context) (*[]Project, erro
 func (api *Client) GetProjectCollaboratorsContext(id string, context context.Context) (*[]Collaborator, error) {
 	response := &CollaboratorsResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"projects/"+id+"/collaborators",
 		api.token,
 		url.Values{},
@@ -101,36 +101,30 @@ func (api *Client) AddProjectContext(addProjectRequest AddProjectRequest, contex
 
 	request, err := json.Marshal(addProjectRequest)
 
-	err = performPost(context, api.httpclient, api.endpoint+"projects", api.token, request, &response, api)
+	err = api.post(context, "projects", api.token, request, &response.Project)
 
 	if err != nil {
 		return nil, err
+	} else {
+		return &response.Project, nil
 	}
-	if !response.Ok {
-		return nil, response.Err()
-	}
-
-	return &response.Project, nil
 }
 
 func (api *Client) UpdateProjectContext(id string, updateProjectRequest UpdateProjectRequest, context context.Context) (*Project, error) {
 	response := &ProjectResponse{}
 	request, _ := json.Marshal(updateProjectRequest)
-	err := performPost(context, api.httpclient, api.endpoint+"projects/"+id, api.token, request, &response, api)
+	err := api.post(context, "projects/"+id, api.token, request, &response.Project)
 
 	if err != nil {
 		return nil, err
+	} else {
+		return &response.Project, nil
 	}
-	if !response.Ok {
-		return nil, response.Err()
-	}
-
-	return &response.Project, nil
 }
 func (api *Client) GetProjectByIdContext(id string, context context.Context) (*Project, error) {
 	response := &ProjectResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"projects/"+id,
 		api.token,
 		url.Values{},

@@ -183,10 +183,7 @@ func getTestSectionById(id string) Section {
 
 func addSection(writer http.ResponseWriter, _ *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	response, _ := json.Marshal(SectionResponse{
-		Section:         getTestSectionByProjectIdAndName("0", "1"),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestSectionByProjectIdAndName("0", "1"))
 	_, err := writer.Write(response)
 	if err != nil {
 		return
@@ -194,10 +191,7 @@ func addSection(writer http.ResponseWriter, _ *http.Request) {
 }
 
 func updateSectionById(id string) func(http.ResponseWriter, *http.Request) {
-	response, _ := json.Marshal(SectionResponse{
-		Section:         getTestSectionByProjectId(id),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestSectionByProjectId(id))
 
 	return func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("Content-Type", "application/json")

@@ -57,16 +57,19 @@ func TestAddTask(t *testing.T) {
 	expectedTask := getTestTaskWithId("1")
 
 	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
+	sectionID := "4"
+	parentID := "5"
+	assigneeID := "6"
 	request1 := AddTaskRequest{
 		Content:     "1",
 		Description: "2",
 		ProjectId:   "3",
-		SectionId:   "4",
-		ParentId:    "5",
+		SectionId:   &sectionID,
+		ParentId:    &parentID,
 		Labels:      []string{"1", "2"},
 		Order:       1,
 		Priority:    2,
-		AssigneeId:  "6",
+		AssigneeId:  &assigneeID,
 		DueString:   "7",
 		DueDate:     "8",
 		DueDatetime: "9",
@@ -179,27 +182,21 @@ func getTestTaskWithId(id string) Task {
 	return Task{
 		CreatorId:    "",
 		CreatedAt:    "",
-		AssigneeId:   "",
-		AssignerId:   "",
+		AssigneeId:   nil,
+		AssignerId:   nil,
 		CommentCount: 0,
 		IsCompleted:  false,
 		Content:      "",
 		Description:  "",
-		Due: Due{
-			Date:        "",
-			IsRecurring: false,
-			Datetime:    "",
-			String:      "",
-			Timezone:    "",
-		},
-		Id:        id,
-		Labels:    nil,
-		Order:     0,
-		Priority:  0,
-		ProjectId: "",
-		SectionId: "",
-		ParentId:  "",
-		Url:       "",
+		Due:          nil,
+		Id:           id,
+		Labels:       nil,
+		Order:        0,
+		Priority:     0,
+		ProjectId:    "",
+		SectionId:    "",
+		ParentId:     "",
+		Url:          "",
 	}
 }
 
@@ -236,10 +233,7 @@ func getTaskById(id string) func(rw http.ResponseWriter, r *http.Request) {
 
 func postTestTask(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	response, _ := json.Marshal(TaskResponse{
-		Task:            getTestTaskWithId("1"),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestTaskWithId("1"))
 	_, err := w.Write(response)
 	if err != nil {
 		return
@@ -247,10 +241,7 @@ func postTestTask(w http.ResponseWriter, _ *http.Request) {
 }
 
 func addTestTaskById(id string) func(rw http.ResponseWriter, r *http.Request) {
-	response, _ := json.Marshal(TaskResponse{
-		Task:            getTestTaskWithId(id),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestTaskWithId(id))
 
 	return func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("Content-Type", "application/json")

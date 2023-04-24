@@ -236,10 +236,7 @@ func postLabelNewName() func(w http.ResponseWriter, r *http.Request) {
 
 func postTestLabel(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	response, _ := json.Marshal(LabelResponse{
-		Label:           getTestLabelWithId("1"),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestLabelWithId("1"))
 	_, err := w.Write(response)
 	if err != nil {
 		return

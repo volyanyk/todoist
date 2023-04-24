@@ -49,7 +49,7 @@ func (api *Client) GetSectionsByProjectIdContext(projectId string, context conte
 	values := url.Values{
 		"project_id": {projectId},
 	}
-	err := api.getMethod(context,
+	err := api.get(context,
 		"sections",
 		api.token,
 		values,
@@ -61,7 +61,7 @@ func (api *Client) GetSectionsByProjectIdContext(projectId string, context conte
 func (api *Client) GetSectionCollaboratorsContext(id string, context context.Context) (*[]Collaborator, error) {
 	response := &CollaboratorsResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"sections/"+id+"/collaborators",
 		api.token,
 		url.Values{},
@@ -73,38 +73,34 @@ func (api *Client) GetSectionCollaboratorsContext(id string, context context.Con
 func (api *Client) AddSectionContext(params *SectionParameters, context context.Context) (*Section, error) {
 	response := &SectionResponse{}
 	request, _ := json.Marshal(params)
-	err := performPost(context, api.httpclient, api.endpoint+"sections", api.token, request, &response, api)
+	err := api.post(context, "sections", api.token, request, &response.Section)
 
 	if err != nil {
 		return nil, err
-	}
-	if !response.Ok {
-		return nil, response.Err()
+	} else {
+		return &response.Section, nil
 	}
 
-	return &response.Section, nil
 }
 
-func (api *Client) UpdateSectionContext(projectId string, name string, context context.Context) (*Section, error) {
+func (api *Client) UpdateSectionContext(sectionId string, name string, context context.Context) (*Section, error) {
 	response := &SectionResponse{}
 	request, _ := json.Marshal(map[string]string{
 		"name": name,
 	})
-	err := performPost(context, api.httpclient, api.endpoint+"sections/"+projectId, api.token, request, &response, api)
+	err := api.post(context, "sections/"+sectionId, api.token, request, &response.Section)
 
 	if err != nil {
 		return nil, err
-	}
-	if !response.Ok {
-		return nil, response.Err()
+	} else {
+		return &response.Section, nil
 	}
 
-	return &response.Section, nil
 }
 func (api *Client) GetSectionByIdContext(id string, context context.Context) (*Section, error) {
 	response := &SectionResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"sections/"+id,
 		api.token,
 		url.Values{},

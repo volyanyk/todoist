@@ -58,7 +58,7 @@ func (api *Client) DeleteLabelById(id string) (*TodoistResponse, error) {
 func (api *Client) GetLabelsContext(context context.Context) (*[]Label, error) {
 	response := &LabelsResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"labels",
 		api.token,
 		url.Values{},
@@ -69,7 +69,7 @@ func (api *Client) GetLabelsContext(context context.Context) (*[]Label, error) {
 func (api *Client) GetSharedLabelsContext(context context.Context) (*[]Label, error) {
 	response := &LabelsResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"labels/shared",
 		api.token,
 		url.Values{},
@@ -83,31 +83,26 @@ func (api *Client) AddLabelContext(addLabelRequest LabelRequest, context context
 
 	request, err := json.Marshal(addLabelRequest)
 
-	err = performPost(context, api.httpclient, api.endpoint+"labels", api.token, request, &response, api)
+	err = api.post(context, "labels", api.token, request, &response.Label)
 
 	if err != nil {
 		return nil, err
+	} else {
+		return &response.Label, nil
 	}
-	if !response.Ok {
-		return nil, response.Err()
-	}
-
-	return &response.Label, nil
 }
 
 func (api *Client) UpdateLabelContext(id string, updateLabelRequest LabelRequest, context context.Context) (*Label, error) {
 	response := &LabelResponse{}
 	request, _ := json.Marshal(updateLabelRequest)
-	err := performPost(context, api.httpclient, api.endpoint+"labels/"+id, api.token, request, &response, api)
+	err := api.post(context, "labels/"+id, api.token, request, &response.Label)
 
 	if err != nil {
 		return nil, err
-	}
-	if !response.Ok {
-		return nil, response.Err()
+	} else {
+		return &response.Label, nil
 	}
 
-	return &response.Label, nil
 }
 func (api *Client) RenameLabelContext(oldName string, newName string, context context.Context) (*TodoistResponse, error) {
 	response := &TodoistResponse{}
@@ -115,37 +110,31 @@ func (api *Client) RenameLabelContext(oldName string, newName string, context co
 		"name":     oldName,
 		"new_name": newName,
 	})
-	err := performPost(context, api.httpclient, api.endpoint+"labels/shared/rename", api.token, request, &response, api)
+	err := api.post(context, "labels/shared/rename", api.token, request, &response)
 
 	if err != nil {
 		return nil, err
+	} else {
+		return response, nil
 	}
-	if !response.Ok {
-		return nil, response.Err()
-	}
-
-	return response, nil
 }
 func (api *Client) RemoveSharedLabelContext(name string, context context.Context) (*TodoistResponse, error) {
 	response := &TodoistResponse{}
 	request, _ := json.Marshal(map[string]string{
 		"name": name,
 	})
-	err := performPost(context, api.httpclient, api.endpoint+"labels/shared/remove", api.token, request, &response, api)
+	err := api.post(context, "labels/shared/remove", api.token, request, &response)
 
 	if err != nil {
 		return nil, err
+	} else {
+		return response, nil
 	}
-	if !response.Ok {
-		return nil, response.Err()
-	}
-
-	return response, nil
 }
 func (api *Client) GetLabelByIdContext(id string, context context.Context) (*Label, error) {
 	response := &LabelResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"labels/"+id,
 		api.token,
 		url.Values{},
