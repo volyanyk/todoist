@@ -53,7 +53,10 @@ type httpClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-func (api *Client) getMethod(ctx context.Context, path string, token string, values url.Values, intf interface{}) error {
+func (api *Client) post(ctx context.Context, path string, token string, json []byte, intf interface{}) error {
+	return performPost(ctx, api.httpclient, api.endpoint+path, token, json, intf, api)
+}
+func (api *Client) get(ctx context.Context, path string, token string, values url.Values, intf interface{}) error {
 	return performGet(ctx, api.httpclient, api.endpoint+path, token, values, intf, api)
 }
 

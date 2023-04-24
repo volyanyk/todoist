@@ -17,12 +17,12 @@ type CommentResponse struct {
 }
 
 type Comment struct {
-	Content    string     `json:"content"`
-	Id         string     `json:"id"`
-	PostedAt   string     `json:"posted_at"`
-	ProjectId  string     `json:"project_id"`
-	TaskId     string     `json:"task_id"`
-	Attachment Attachment `json:"attachment"`
+	Content    string      `json:"content"`
+	Id         string      `json:"id"`
+	PostedAt   string      `json:"posted_at"`
+	ProjectId  string      `json:"project_id"`
+	TaskId     string      `json:"task_id"`
+	Attachment *Attachment `json:"attachment"`
 }
 type Attachment struct {
 	ResourceType string `json:"resource_type"`
@@ -71,7 +71,7 @@ func (api *Client) GetAllCommentsContext(projectId string, taskId string, contex
 		return nil, fmt.Errorf("task_id or project_id are missing on input")
 	}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"comments",
 		api.token,
 		values,
@@ -83,16 +83,13 @@ func (api *Client) GetAllCommentsContext(projectId string, taskId string, contex
 func (api *Client) AddCommentContext(params *NewCommentParameters, context context.Context) (*Comment, error) {
 	response := &CommentResponse{}
 	request, _ := json.Marshal(params)
-	err := performPost(context, api.httpclient, api.endpoint+"comments", api.token, request, &response, api)
+	err := api.post(context, "comments", api.token, request, &response.Comment)
 
 	if err != nil {
 		return nil, err
+	} else {
+		return &response.Comment, nil
 	}
-	if !response.Ok {
-		return nil, response.Err()
-	}
-
-	return &response.Comment, nil
 }
 
 func (api *Client) UpdateCommentContext(id string, content string, context context.Context) (*Comment, error) {
@@ -100,21 +97,19 @@ func (api *Client) UpdateCommentContext(id string, content string, context conte
 	request, _ := json.Marshal(map[string]string{
 		"content": content,
 	})
-	err := performPost(context, api.httpclient, api.endpoint+"comments/"+id, api.token, request, &response, api)
+	err := api.post(context, "comments/"+id, api.token, request, &response.Comment)
 
 	if err != nil {
 		return nil, err
-	}
-	if !response.Ok {
-		return nil, response.Err()
+	} else {
+		return &response.Comment, nil
 	}
 
-	return &response.Comment, nil
 }
 func (api *Client) GetCommentByIdContext(id string, context context.Context) (*Comment, error) {
 	response := &CommentResponse{}
 
-	err := api.getMethod(context,
+	err := api.get(context,
 		"comments/"+id,
 		api.token,
 		url.Values{},

@@ -195,7 +195,7 @@ func getTestCommentByProjectId(projectId string) Comment {
 		PostedAt:   "",
 		ProjectId:  projectId,
 		TaskId:     "",
-		Attachment: Attachment{},
+		Attachment: nil,
 	}
 }
 func getTestCommentByTaskId(taskId string) Comment {
@@ -205,7 +205,7 @@ func getTestCommentByTaskId(taskId string) Comment {
 		PostedAt:   "",
 		ProjectId:  "",
 		TaskId:     taskId,
-		Attachment: Attachment{},
+		Attachment: nil,
 	}
 }
 
@@ -230,16 +230,13 @@ func getTestCommentById(id string) Comment {
 		PostedAt:   "",
 		ProjectId:  "",
 		TaskId:     "",
-		Attachment: Attachment{},
+		Attachment: nil,
 	}
 }
 
 func addComment(writer http.ResponseWriter, _ *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	response, _ := json.Marshal(CommentResponse{
-		Comment:         getTestCommentById("1"),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestCommentById("1"))
 	_, err := writer.Write(response)
 	if err != nil {
 		return
@@ -247,10 +244,7 @@ func addComment(writer http.ResponseWriter, _ *http.Request) {
 }
 
 func updateCommentById(id string) func(http.ResponseWriter, *http.Request) {
-	response, _ := json.Marshal(CommentResponse{
-		Comment:         getTestCommentById(id),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestCommentById(id))
 
 	return func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("Content-Type", "application/json")

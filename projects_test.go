@@ -205,10 +205,7 @@ func getProjectCollaborators(rw http.ResponseWriter, _ *http.Request) {
 
 func postTestProject(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	response, _ := json.Marshal(ProjectResponse{
-		Project:         getTestProjectWithId("1"),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestProjectWithId("1"))
 	_, err := w.Write(response)
 	if err != nil {
 		return
@@ -216,10 +213,7 @@ func postTestProject(w http.ResponseWriter, _ *http.Request) {
 }
 
 func postTestProjectById(id string) func(rw http.ResponseWriter, r *http.Request) {
-	response, _ := json.Marshal(ProjectResponse{
-		Project:         getTestProjectWithId(id),
-		TodoistResponse: TodoistResponse{Ok: true},
-	})
+	response, _ := json.Marshal(getTestProjectWithId(id))
 
 	return func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("Content-Type", "application/json")
