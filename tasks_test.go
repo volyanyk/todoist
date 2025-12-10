@@ -60,6 +60,8 @@ func TestAddTask(t *testing.T) {
 	sectionID := "4"
 	parentID := "5"
 	assigneeID := "6"
+	priority := 2
+	order := 1
 	request1 := AddTaskRequest{
 		Content:     "1",
 		Description: "2",
@@ -67,8 +69,8 @@ func TestAddTask(t *testing.T) {
 		SectionId:   &sectionID,
 		ParentId:    &parentID,
 		Labels:      []string{"1", "2"},
-		Order:       1,
-		Priority:    2,
+		Order:       &order,
+		Priority:    &priority,
 		AssigneeId:  &assigneeID,
 		DueString:   "7",
 		DueDate:     "8",
@@ -194,8 +196,8 @@ func getTestTaskWithId(id string) Task {
 		Order:        0,
 		Priority:     0,
 		ProjectId:    "",
-		SectionId:    "",
-		ParentId:     "",
+		SectionId:    nil,
+		ParentId:     nil,
 		Url:          "",
 	}
 }

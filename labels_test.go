@@ -66,11 +66,13 @@ func TestPostLabel(t *testing.T) {
 	expectedProject := getTestLabelWithId("1")
 
 	api := New(validToken, OptionAPIURL("http://"+serverAddr+"/"))
+	order := 0
+	isFavorite := false
 	request1 := LabelRequest{
 		Name:       "name",
 		Color:      "",
-		Order:      0,
-		IsFavorite: false,
+		Order:      &order,
+		IsFavorite: &isFavorite,
 	}
 	project, err := api.AddLabel(request1)
 	if err != nil {
@@ -176,7 +178,7 @@ func getTestLabelWithId(id string) Label {
 		ID:         id,
 		Name:       "",
 		Color:      "",
-		Order:      0,
+		Order:      nil,
 		IsFavorite: false,
 	}
 }

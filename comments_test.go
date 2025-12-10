@@ -193,8 +193,8 @@ func getTestCommentByProjectId(projectId string) Comment {
 		Content:    "",
 		Id:         "",
 		PostedAt:   "",
-		ProjectId:  projectId,
-		TaskId:     "",
+		ProjectId:  &projectId,
+		TaskId:     nil,
 		Attachment: nil,
 	}
 }
@@ -203,8 +203,8 @@ func getTestCommentByTaskId(taskId string) Comment {
 		Content:    "",
 		Id:         "",
 		PostedAt:   "",
-		ProjectId:  "",
-		TaskId:     taskId,
+		ProjectId:  nil,
+		TaskId:     &taskId,
 		Attachment: nil,
 	}
 }
@@ -228,8 +228,8 @@ func getTestCommentById(id string) Comment {
 		Content:    "",
 		Id:         id,
 		PostedAt:   "",
-		ProjectId:  "",
-		TaskId:     "",
+		ProjectId:  nil,
+		TaskId:     nil,
 		Attachment: nil,
 	}
 }

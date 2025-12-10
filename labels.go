@@ -19,15 +19,15 @@ type Label struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Color      string `json:"color"`
-	Order      int    `json:"order"`
+	Order      *int   `json:"order"`
 	IsFavorite bool   `json:"is_favorite"`
 }
 
 type LabelRequest struct {
 	Name       string `json:"name"`        // Required / Optional
 	Color      string `json:"color"`       // Optional
-	Order      int    `json:"order"`       // Optional
-	IsFavorite bool   `json:"is_favorite"` // Optional
+	Order      *int   `json:"order"`       // Optional
+	IsFavorite *bool  `json:"is_favorite"` // Optional
 }
 
 func (api *Client) GetLabels() (*[]Label, error) {

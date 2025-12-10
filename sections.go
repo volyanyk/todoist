@@ -18,14 +18,14 @@ type SectionResponse struct {
 type Section struct {
 	ID        string `json:"id"`
 	ProjectId string `json:"project_id"`
-	Order     int    `json:"order"`
+	Order     *int   `json:"order"`
 	Name      string `json:"name"`
 }
 
 type SectionParameters struct {
 	ProjectId string `json:"project_id"`
 	Name      string `json:"name"`
-	Order     int    `json:"order"`
+	Order     *int   `json:"order"`
 }
 
 func (api *Client) GetSectionsByProjectId(projectId string) (*[]Section, error) {

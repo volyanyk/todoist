@@ -20,8 +20,8 @@ type Comment struct {
 	Content    string      `json:"content"`
 	Id         string      `json:"id"`
 	PostedAt   string      `json:"posted_at"`
-	ProjectId  string      `json:"project_id"`
-	TaskId     string      `json:"task_id"`
+	ProjectId  *string     `json:"project_id"`
+	TaskId     *string     `json:"task_id"`
 	Attachment *Attachment `json:"attachment"`
 }
 type Attachment struct {

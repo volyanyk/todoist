@@ -148,8 +148,8 @@ func getTestProjectCollaboratorWithId(id string) Collaborator {
 func getTestProjectWithId(id string) Project {
 	return Project{
 		ID:             id,
-		ParentId:       "",
-		Order:          0,
+		ParentId:       nil,
+		Order:          nil,
 		Color:          "",
 		Name:           "",
 		CommentCount:   0,

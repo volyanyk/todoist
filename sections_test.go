@@ -153,7 +153,7 @@ func getTestSectionByProjectIdAndName(projectId string, name string) Section {
 	return Section{
 		ID:        "",
 		ProjectId: projectId,
-		Order:     0,
+		Order:     nil,
 		Name:      name,
 	}
 }
@@ -176,7 +176,7 @@ func getTestSectionById(id string) Section {
 	return Section{
 		ID:        id,
 		ProjectId: "",
-		Order:     0,
+		Order:     nil,
 		Name:      "",
 	}
 }

@@ -24,53 +24,34 @@ type Due struct {
 }
 
 type Task struct {
-	Id           string `json:"id"`
-	AssignerId   any    `json:"assigner_id"`
-	AssigneeId   any    `json:"assignee_id"`
-	ProjectId    string `json:"project_id"`
-	SectionId    string `json:"section_id"`
-	ParentId     any    `json:"parent_id"`
-	Order        int    `json:"order"`
-	Content      string `json:"content"`
-	Description  string `json:"description"`
-	IsCompleted  bool   `json:"is_completed"`
-	Labels       []any  `json:"labels"`
-	Priority     int    `json:"priority"`
-	CommentCount int    `json:"comment_count"`
-	CreatorId    string `json:"creator_id"`
-	CreatedAt    string `json:"created_at"`
-	Due          *Due   `json:"due"`
-	Url          string `json:"url"`
-}
-
-type Task1 struct {
-	CreatorId    string   `json:"creator_id"`
-	CreatedAt    string   `json:"created_at"`
-	AssigneeId   *string  `json:"assignee_id"`
+	Id           string   `json:"id"`
 	AssignerId   *string  `json:"assigner_id"`
-	CommentCount int      `json:"comment_count"`
-	IsCompleted  bool     `json:"is_completed"`
+	AssigneeId   *string  `json:"assignee_id"`
+	ProjectId    string   `json:"project_id"`
+	SectionId    *string  `json:"section_id"`
+	ParentId     *string  `json:"parent_id"`
+	Order        int      `json:"order"`
 	Content      string   `json:"content"`
 	Description  string   `json:"description"`
-	Due          *Due     `json:"due"`
-	Id           string   `json:"id"`
+	IsCompleted  bool     `json:"is_completed"`
 	Labels       []string `json:"labels"`
-	Order        int      `json:"order"`
 	Priority     int      `json:"priority"`
-	ProjectId    string   `json:"project_id"`
-	SectionId    string   `json:"section_id"`
-	ParentId     string   `json:"parent_id"`
+	CommentCount int      `json:"comment_count"`
+	CreatorId    string   `json:"creator_id"`
+	CreatedAt    string   `json:"created_at"`
+	Due          *Due     `json:"due"`
 	Url          string   `json:"url"`
 }
+
 type AddTaskRequest struct {
 	Content     string   `json:"content"`
 	Description string   `json:"description"`
 	ProjectId   string   `json:"project_id"`
 	SectionId   *string  `json:"section_id"`
 	ParentId    *string  `json:"parent_id"`
-	Order       int      `json:"order"`
+	Order       *int     `json:"order"`
 	Labels      []string `json:"labels"`
-	Priority    int      `json:"priority"`
+	Priority    *int     `json:"priority"`
 	DueString   string   `json:"due_string"`
 	DueDate     string   `json:"due_date"`
 	DueDatetime string   `json:"due_datetime"`
@@ -90,7 +71,7 @@ type UpdateTaskRequest struct {
 	Content     string   `json:"content"`      // Optional
 	Description string   `json:"description"`  // Optional
 	Labels      []string `json:"labels"`       // Optional
-	Priority    int      `json:"priority"`     // Optional
+	Priority    *int     `json:"priority"`     // Optional
 	DueString   string   `json:"due_string"`   // Optional
 	DueDate     string   `json:"due_date"`     // Optional
 	DueDatetime string   `json:"due_datetime"` // Optional

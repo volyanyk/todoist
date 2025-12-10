@@ -8,10 +8,11 @@ import (
 
 func main() {
 	api := todoist.New("TOKEN")
+	order := 0
 	section := todoist.SectionParameters{
 		ProjectId: "2234026034",
 		Name:      "Test1",
-		Order:     0,
+		Order:     &order,
 	}
 	sections, err := api.AddSection(&section)
 	//sections, err := api.UpdateSection("121915105", "test")
